@@ -6,9 +6,7 @@ export interface Movie {
 }
 
 @Injectable()
-// @Injectable() <- 이렇게 놓으면 IoC 컨테이너한테 너가 이 class를 IoC 컨테이너에서 알아서 관리해줘 라고 명령하는 거랑 똑같다.
-// 그러면 IoC 컨테이너는 AppService를 인스턴스화 해서 내가 다른 곳에서 AppService를 필요로 하는 곳에서 인스턴스화 했으니까 자동으로 넣어줄게! 이러게 된다.
-export class AppService {
+export class MovieService {
   private movies: Movie[] = [
     {
       id: 1,
