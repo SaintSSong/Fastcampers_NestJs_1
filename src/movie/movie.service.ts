@@ -1,26 +1,32 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-
-export interface Movie {
-  id: number;
-  title: string;
-}
+import { CreateMovieDto } from './dto/create-movie.dto';
+import { UpdateMovieDto } from './dto/update-movie.dto';
+import { Movie } from './entity/movie.entity';
 
 @Injectable()
 export class MovieService {
-  private movies: Movie[] = [
-    {
-      id: 1,
-      title: '해리포터',
-    },
-    {
-      id: 2,
-      title: '반지의 제왕',
-    },
-  ];
+  private movies: Movie[] = [];
 
   private idCounter = 3;
 
+  constructor() {
+    const movie1 = new Movie();
+
+    movie1.id = 1;
+    movie1.title = '해리포터';
+    movie1.genre = 'fantasy';
+
+    const movie2 = new Movie();
+    movie2.id = 2;
+    movie2.title = '반지의제왕';
+    movie2.genre = 'action';
+
+    this.movies.push(movie1, movie2);
+  }
+
   getManyMovies(title?: string) {
+    console.log(this.movies);
+
     if (!title) {
       return this.movies;
     }
@@ -38,10 +44,12 @@ export class MovieService {
     return movie;
   }
 
-  createMovie(title: string) {
+  createMovie(
+    /**title: string, genre: string*/ createMovieDto: CreateMovieDto,
+  ) {
     const movie: Movie = {
       id: this.idCounter++,
-      title: title,
+      ...createMovieDto,
     };
 
     this.movies.push(movie);
@@ -49,7 +57,10 @@ export class MovieService {
     return movie;
   }
 
-  updateMovie(id: number, title: string) {
+  updateMovie(
+    id: number /**title?: string, genre?: string*/,
+    updateMovieDto: UpdateMovieDto,
+  ) {
     const movie = this.movies.find((m) => m.id === +id);
 
     if (!movie) {
@@ -58,7 +69,7 @@ export class MovieService {
 
     // 찾은 영화에 타이틀을 덮어씌우는 코드
     // Object.assign은 Js 문법이다.
-    Object.assign(movie, { title });
+    Object.assign(movie, { ...updateMovieDto });
 
     return movie;
   }
