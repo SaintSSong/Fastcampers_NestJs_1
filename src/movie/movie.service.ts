@@ -2,40 +2,36 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { Movie } from './entity/movie.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class MovieService {
-  private movies: Movie[] = [];
+  constructor(
+    @InjectRepository(Movie)
+    private readonly movieRepository: Repository<Movie>,
+  ) {}
 
-  private idCounter = 3;
-
-  constructor() {
-    const movie1 = new Movie();
-
-    movie1.id = 1;
-    movie1.title = '해리포터';
-    movie1.genre = 'fantasy';
-
-    const movie2 = new Movie();
-    movie2.id = 2;
-    movie2.title = '반지의제왕';
-    movie2.genre = 'action';
-
-    this.movies.push(movie1, movie2);
-  }
-
+  // 영화 전체 조회
   getManyMovies(title?: string) {
-    console.log(this.movies);
+    // 나중에 title 필터 기능 추가하기
 
-    if (!title) {
-      return this.movies;
-    }
+    return this.movieRepository.find();
 
-    return this.movies.filter((m) => m.title.startsWith(title)); // startsWith은 ~~로 시작한다.
+    // if (!title) {
+    //   return this.movies;
+    // }
+
+    // return this.movies.filter((m) => m.title.startsWith(title)); // startsWith은 ~~로 시작한다.
   }
 
-  getMovieById(id: number) {
-    const movie = this.movies.find((m) => m.id === +id);
+  // 영화 상세 조회
+  async getMovieById(id: number) {
+    const movie = await this.movieRepository.findOne({
+      where: {
+        id,
+      },
+    });
 
     if (!movie) {
       throw new NotFoundException('존재하지 않는 영화입니다.'); // NotFoundException는 Nest에서 제공하는 메서드다.
@@ -44,46 +40,64 @@ export class MovieService {
     return movie;
   }
 
-  createMovie(
+  // 영화 생성
+  async createMovie(
     /**title: string, genre: string*/ createMovieDto: CreateMovieDto,
   ) {
-    const movie: Movie = {
-      id: this.idCounter++,
-      ...createMovieDto,
-    };
+    const movie = await this.movieRepository.save(
+      // title: createMovieDto.title,
+      // genre: createMovieDto.genre,
 
-    this.movies.push(movie);
+      createMovieDto,
+    );
 
     return movie;
   }
 
-  updateMovie(
+  // 영화 수정
+  async updateMovie(
     id: number /**title?: string, genre?: string*/,
     updateMovieDto: UpdateMovieDto,
   ) {
-    const movie = this.movies.find((m) => m.id === +id);
+    const movie = await this.movieRepository.findOne({
+      where: {
+        id,
+      },
+    });
 
     if (!movie) {
-      throw new NotFoundException('존재하지 않는 영화입니다.'); // NotFoundException는 Nest에서 제공하는 메서드다.
+      throw new NotFoundException('존재하지 않는 영화입니다.');
     }
 
-    // 찾은 영화에 타이틀을 덮어씌우는 코드
-    // Object.assign은 Js 문법이다.
-    Object.assign(movie, { ...updateMovieDto });
+    await this.movieRepository.update(
+      {
+        id,
+      },
+      updateMovieDto,
+    );
 
-    return movie;
+    const newMovie = await this.movieRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    return newMovie;
   }
 
-  deleteMovie(id: number) {
-    const movieIndex = this.movies.findIndex((m) => m.id === +id);
+  // 영화 삭제
+  async deleteMovie(id: number) {
+    const movie = await this.movieRepository.findOne({
+      where: {
+        id,
+      },
+    });
 
-    if (movieIndex === -1) {
-      // <- !movieIndex는 id가 0이 나올 수 있으니까 안된다. findIndex는 positive만 나오기 때문에 -1로 넣어야한다.
-      throw new NotFoundException('존재하지 않는 영화입니다.'); // NotFoundException는 Nest에서 제공하는 메서드다.
+    if (!movie) {
+      throw new NotFoundException('존재하지 않는 영화입니다.');
     }
 
-    // 배열에서 빼는 함수 사용해야한다.
-    this.movies.splice(movieIndex, 1);
+    this.movieRepository.delete(id);
 
     return id;
   }
