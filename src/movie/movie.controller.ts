@@ -31,13 +31,7 @@ export class MovieController {
   }
 
   @Post()
-  postMovie(
-    // @Body('title') // <- body값으로 받을 key를 () 속에 넣는 것이다.
-    // title: string, // <- body값의 value의 속성을 의미한다.
-    // @Body('genre') genre: string,
-
-    @Body() body: CreateMovieDto,
-  ) {
+  postMovie(@Body() body: CreateMovieDto) {
     return this.movieService.createMovie(body);
   }
 
