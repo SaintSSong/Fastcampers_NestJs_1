@@ -6,6 +6,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { Movie } from './movie/entity/movie.entity';
 import { MovieDetail } from './movie/entity/movie-detail.entity';
+import { DirectorModule } from './director/director.module';
+import { Director } from './director/entitie/director.entity';
 
 @Module({
   imports: [
@@ -31,12 +33,13 @@ import { MovieDetail } from './movie/entity/movie-detail.entity';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [Movie, MovieDetail], // <=여기 다가는 등록할 엔티티를 넣으면 된다. DB 테이블로 형성한 엔티티를 넣으면 된다.
+        entities: [Movie, MovieDetail, Director], // <=여기 다가는 등록할 엔티티를 넣으면 된다. DB 테이블로 형성한 엔티티를 넣으면 된다.
         synchronize: true, // <- 개발할 때만 true 배포하고 나서는 false로 놔야 한다.
       }),
       inject: [ConfigService],
     }),
     MovieModule,
+    DirectorModule,
   ],
 })
 export class AppModule {}

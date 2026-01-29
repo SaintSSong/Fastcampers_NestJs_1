@@ -16,7 +16,7 @@ export class MovieService {
   ) {}
 
   // 영화 전체 조회
-  async getManyMovies(title?: string) {
+  async findAll(title?: string) {
     // 나중에 title 필터 기능 추가하기
 
     if (!title) {
@@ -34,7 +34,7 @@ export class MovieService {
   }
 
   // 영화 상세 조회
-  async getMovieById(id: number) {
+  async findOne(id: number) {
     const movie = await this.movieRepository.findOne({
       where: {
         id,
@@ -50,7 +50,7 @@ export class MovieService {
   }
 
   // 영화 생성
-  async createMovie(createMovieDto: CreateMovieDto) {
+  async create(createMovieDto: CreateMovieDto) {
     const movie = await this.movieRepository.save({
       title: createMovieDto.title,
       genre: createMovieDto.genre,
@@ -63,7 +63,7 @@ export class MovieService {
   }
 
   // 영화 수정
-  async updateMovie(
+  async update(
     id: number /**title?: string, genre?: string*/,
     updateMovieDto: UpdateMovieDto,
   ) {
@@ -107,7 +107,7 @@ export class MovieService {
   }
 
   // 영화 삭제
-  async deleteMovie(id: number) {
+  async remove(id: number) {
     const movie = await this.movieRepository.findOne({
       where: {
         id,
