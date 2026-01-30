@@ -3,6 +3,8 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -12,6 +14,7 @@ import {
 import { BaseTable } from '../../common/entity/base-table.entity';
 import { MovieDetail } from './movie-detail.entity';
 import { Director } from 'src/director/entitie/director.entity';
+import { Genre } from 'src/genre/entities/genre.entity';
 
 // ManyToOne  감독 - >감독은 여러개의 영화를 만들 수 있음.
 // OneToOne   무비 디테일 -> 영화는 하나의 상세 내용을 가질 수 있음
@@ -22,18 +25,27 @@ export class Movie extends BaseTable {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({
+    unique: true,
+  })
   title: string;
 
-  @Column()
-  genre: string;
+  @ManyToMany(() => Genre, (gnere) => gnere.movies, {
+    // cascade: true,
+  })
+  @JoinTable()
+  genres: Genre[];
 
   @OneToOne(() => MovieDetail, (movieDetail) => movieDetail.id, {
     cascade: true, // <- cascade: true로 해야지 한번에 생성이 가능하다. 아니면 따로 따로 생성해서 그걸 붙여서 반환해야하는데 그러면 길어진다.
+    nullable: false, // null 불가 꼭 잘 확인해야 함.
   }) // 나랑 관계를 맻는 녀석을 작성해줘야한다.
   @JoinColumn() // <- 영화와 영화 상세 둘 중 영화가 가지고 있는게 더 좋다. 사실 상관은 없다. 상대편에 넣어도 된다.
   detail: MovieDetail;
 
-  @ManyToOne(() => Director, (director) => director.id)
+  @ManyToOne(() => Director, (director) => director.id, {
+    cascade: true,
+    nullable: false,
+  })
   director: Director;
 }

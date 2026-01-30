@@ -6,7 +6,9 @@ export class MovieDetail {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({
+    unique: true,
+  })
   detail: string;
 
   @OneToOne(() => Movie, (movie) => movie.id)

@@ -1,36 +1,11 @@
 import {
-  Contains,
-  Equals,
-  IsAlphanumeric,
+  ArrayNotEmpty,
   IsArray,
-  IsBoolean,
-  IsCreditCard,
-  IsDate,
-  IsDateString,
-  IsDefined,
-  IsDivisibleBy,
-  IsEmpty,
-  IsEnum,
-  IsHexColor,
-  IsIn,
-  IsInt,
-  IsLatLong,
-  IsNegative,
   IsNotEmpty,
-  IsNotIn,
   IsNumber,
   IsOptional,
-  IsPositive,
   IsString,
-  IsUUID,
-  Max,
-  MaxLength,
-  Min,
-  MinLength,
-  NotContains,
-  NotEquals,
   registerDecorator,
-  Validate,
   ValidationArguments,
   ValidationOptions,
   ValidatorConstraint,
@@ -71,13 +46,27 @@ function IsPasswordValid(validationOptions?: ValidationOptions) {
 export class UpdateMovieDto {
   @IsNotEmpty()
   @IsOptional() // <- 이거 없으면 옵셔널 성격을 못 준다. ?를 줬어도
+  @IsString()
   title?: string;
 
-  @IsNotEmpty()
+  @IsArray()
   @IsOptional()
-  genre?: string;
+  @ArrayNotEmpty()
+  @IsNumber(
+    {}, // <= IsNumber의 고유 값인데 빈칸 놔도 무방
+    {
+      each: true, // 배열 안에 모든 값들을 각각 검증하는 기술 = 모두 다 숫자여야한다.
+    },
+  )
+  genreIds?: number[];
 
   @IsNotEmpty()
   @IsOptional()
+  @IsString()
   detail?: string;
+
+  @IsNotEmpty()
+  @IsOptional()
+  @IsNumber()
+  directorId?: number;
 }
