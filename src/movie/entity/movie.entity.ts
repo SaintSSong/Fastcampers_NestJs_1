@@ -13,7 +13,7 @@ import {
 } from 'typeorm';
 import { BaseTable } from '../../common/entity/base-table.entity';
 import { MovieDetail } from './movie-detail.entity';
-import { Director } from 'src/director/entitie/director.entity';
+import { Director } from 'src/director/entity/director.entity';
 import { Genre } from 'src/genre/entities/genre.entity';
 
 // ManyToOne  감독 - >감독은 여러개의 영화를 만들 수 있음.

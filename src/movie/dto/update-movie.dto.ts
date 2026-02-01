@@ -11,11 +11,8 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-
-enum MovieGenre {
-  Fantasy = 'fantasy',
-  Action = 'action',
-}
+import { CreateMovieDto } from './create-movie.dto';
+import { PartialType } from '@nestjs/mapped-types';
 
 // 커스텀 방법 1
 @ValidatorConstraint() // <- 이걸 해야지 customValidator로 @ 시킬 수 있다.
@@ -43,30 +40,27 @@ function IsPasswordValid(validationOptions?: ValidationOptions) {
   };
 }
 
-export class UpdateMovieDto {
-  @IsNotEmpty()
-  @IsOptional() // <- 이거 없으면 옵셔널 성격을 못 준다. ?를 줬어도
-  @IsString()
-  title?: string;
-
-  @IsArray()
-  @IsOptional()
-  @ArrayNotEmpty()
-  @IsNumber(
-    {}, // <= IsNumber의 고유 값인데 빈칸 놔도 무방
-    {
-      each: true, // 배열 안에 모든 값들을 각각 검증하는 기술 = 모두 다 숫자여야한다.
-    },
-  )
-  genreIds?: number[];
-
-  @IsNotEmpty()
-  @IsOptional()
-  @IsString()
-  detail?: string;
-
-  @IsNotEmpty()
-  @IsOptional()
-  @IsNumber()
-  directorId?: number;
+export class UpdateMovieDto extends PartialType(CreateMovieDto) {
+  // @IsNotEmpty()
+  // @IsOptional() // <- 이거 없으면 옵셔널 성격을 못 준다. ?를 줬어도
+  // @IsString()
+  // title?: string;
+  // @IsArray()
+  // @IsOptional()
+  // @ArrayNotEmpty()
+  // @IsNumber(
+  //   {}, // <= IsNumber의 고유 값인데 빈칸 놔도 무방
+  //   {
+  //     each: true, // 배열 안에 모든 값들을 각각 검증하는 기술 = 모두 다 숫자여야한다.
+  //   },
+  // )
+  // genreIds?: number[];
+  // @IsNotEmpty()
+  // @IsOptional()
+  // @IsString()
+  // detail?: string;
+  // @IsNotEmpty()
+  // @IsOptional()
+  // @IsNumber()
+  // directorId?: number;
 }

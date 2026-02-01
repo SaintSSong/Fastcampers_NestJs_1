@@ -6,12 +6,17 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  ParseIntPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { DirectorService } from './director.service';
 import { CreateDirectorDto } from './dto/create-director.dto';
 import { UpdateDirectorDto } from './dto/update-director.dto';
 
 @Controller('director')
+@UseInterceptors(ClassSerializerInterceptor)
 export class DirectorController {
   constructor(private readonly directorService: DirectorService) {}
 
@@ -21,7 +26,17 @@ export class DirectorController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory(error) {
+          throw new BadRequestException('숫자를 입력해주세요.');
+        },
+      }),
+    )
+    id: string,
+  ) {
     return this.directorService.findOne(+id);
   }
 
@@ -32,14 +47,32 @@ export class DirectorController {
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory(error) {
+          throw new BadRequestException('숫자를 입력해주세요.');
+        },
+      }),
+    )
+    id: string,
     @Body() updateDirectorDto: UpdateDirectorDto,
   ) {
     return this.directorService.update(+id, updateDirectorDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory(error) {
+          throw new BadRequestException('숫자를 입력해주세요.');
+        },
+      }),
+    )
+    id: string,
+  ) {
     return this.directorService.remove(+id);
   }
 }
