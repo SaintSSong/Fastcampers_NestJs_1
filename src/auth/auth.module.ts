@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './strategy/local.strategy';
+import { JwtStrategy } from './strategy/jwt.strategy';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { LocalStrategy } from './strategy/local.strategy';
   providers: [
     AuthService,
     LocalStrategy, // passport Strategy 쓸 때 넣어야한다.
+    JwtStrategy,
   ],
   exports: [AuthService], // passport Strategy 쓸 때 넣어야한다.  AuthService안에 로그인에 필요한 데이터를 다른 곳에서 쓸 수 있도록
 })
