@@ -23,6 +23,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'samuelCode') {
    * return -> Request()
    */
   async validate(email: string, password: string) {
+    console.log('1', email, password);
     const user = await this.authService.authenticate(email, password);
 
     return user;

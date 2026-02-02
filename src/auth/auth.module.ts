@@ -20,6 +20,6 @@ import { JwtStrategy } from './strategy/jwt.strategy';
     LocalStrategy, // passport Strategy 쓸 때 넣어야한다.
     JwtStrategy,
   ],
-  exports: [AuthService], // passport Strategy 쓸 때 넣어야한다.  AuthService안에 로그인에 필요한 데이터를 다른 곳에서 쓸 수 있도록
+  exports: [AuthService, JwtModule], // passport Strategy 쓸 때 넣어야한다.  AuthService안에 로그인에 필요한 데이터를 다른 곳에서 쓸 수 있도록
 })
 export class AuthModule {}

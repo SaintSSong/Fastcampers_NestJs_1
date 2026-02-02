@@ -18,6 +18,7 @@ export class AuthController {
   @Post('register')
   // authorization: Basic $token
   registerUser(@Headers('authorization') token: string) {
+    console.log('2. token', token);
     return this.authService.register(token);
   }
 
@@ -29,11 +30,9 @@ export class AuthController {
 
   // accessToken 재발급
   @Post('token/access')
-  async rotateAccessToken(@Headers('authorization') token: string) {
-    const payload = await this.authService.parseBearerToken(token, true);
-
+  async rotateAccessToken(@Request() req) {
     return {
-      accessToken: await this.authService.issueToken(payload, false),
+      accessToken: await this.authService.issueToken(req.user, false),
     };
   }
 
@@ -54,6 +53,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('private')
   async private(@Request() req) {
+    // console.log('req', req.user);
     return req.user;
   }
 }

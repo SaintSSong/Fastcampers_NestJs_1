@@ -1,12 +1,23 @@
-const env = "ENV" 
- ENV: Joi.string().valid('dev', 'prod').required(),
+const env = 'ENV';
+const dbType = 'DB_TYPE';
+const dbHost = 'DB_HOST';
+const dbPort = 'DB_PORT';
+const dbUsername = 'DB_USERNAME';
+const dbPassword = 'DB_PASSWORD';
+const dbDatabase = 'DB_DATABASE';
+const hashRounds = 'HASH_ROUNDS';
+const accessTokenSecret = 'ACCESS_TOKEN_SECRET';
+const refreshTokenSecret = 'REFRESH_TOKEN_SECRET';
 
-        DB_TYPE: Joi.string().valid('postgres').required(), // .valid('postgres') 이걸 넣으면 postgresql만 가능하다.
-        DB_HOST: Joi.string().required(),
-        DB_PORT: Joi.number().required(),
-        DB_USERNAME: Joi.string().required(),
-        DB_PASSWORD: Joi.string().required(),
-        DB_DATABASE: Joi.string().required(),
-        HASH_ROUNDS: Joi.number().required(),
-        ACCESS_TOKEN_SECRET: Joi.string().required(),
-        REFRESH_TOKEN_SECRET: Joi.string().required(),
+export const envVariableKeys = {
+  env,
+  dbType,
+  dbHost,
+  dbPort,
+  dbUsername,
+  dbPassword,
+  dbDatabase,
+  hashRounds,
+  accessTokenSecret,
+  refreshTokenSecret,
+};
