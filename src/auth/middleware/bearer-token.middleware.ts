@@ -34,14 +34,14 @@ export class BearerTokenMiddleware implements NestMiddleware {
       const decodedPayload = this.jwtService.decode(token);
 
       if (
-        decodedPayload.tokenType !== 'refresh' &&
-        decodedPayload.tokenType !== 'access'
+        decodedPayload.type !== 'refresh' &&
+        decodedPayload.type !== 'access'
       ) {
         throw new UnauthorizedException('잘못된 토큰입니다.');
       }
 
       const secretKey =
-        decodedPayload.tokenType === 'refresh'
+        decodedPayload.type === 'refresh'
           ? envVariableKeys.refreshTokenSecret
           : envVariableKeys.accessTokenSecret;
 

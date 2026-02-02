@@ -18,6 +18,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   validate(payload: any) {
     console.log('JWT.payload', payload);
-    return payload;
+    return payload; // passport는 자동으로 이 return 값을 user라고 생각함.
   }
 }

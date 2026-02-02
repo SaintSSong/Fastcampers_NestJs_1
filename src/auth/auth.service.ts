@@ -76,11 +76,11 @@ export class AuthService {
       });
 
       if (isRefreshToken) {
-        if (payload.tokenType !== 'refresh') {
+        if (payload.type !== 'refresh') {
           throw new BadRequestException('RefreshToken을 입력해주세요.');
         }
       } else {
-        if (payload.tokenType !== 'access') {
+        if (payload.type !== 'access') {
           throw new BadRequestException('AccessToken을 입력해주세요.');
         }
       }
@@ -153,10 +153,9 @@ export class AuthService {
 
     return this.jwtService.signAsync(
       {
-        userId: user.id,
-        // email: user.email,
-        userRole: user.role,
-        tokenType: isRefreshToken ? 'refresh' : 'access',
+        id: user.id,
+        role: Role[user.role],
+        type: isRefreshToken ? 'refresh' : 'access',
       },
       {
         secret: isRefreshToken ? refreshTokenSecret : accessTokenSecret,

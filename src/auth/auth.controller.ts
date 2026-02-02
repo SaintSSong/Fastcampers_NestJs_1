@@ -31,6 +31,7 @@ export class AuthController {
   // accessToken 재발급
   @Post('token/access')
   async rotateAccessToken(@Request() req) {
+    console.log('req.user', req.user);
     return {
       accessToken: await this.authService.issueToken(req.user, false),
     };
