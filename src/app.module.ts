@@ -64,8 +64,8 @@ import { AuthGuard } from './auth/guard/auth.guard';
   providers: [
     //<- 기본으로 PG 전체에 AuthGuard를 적용시킨다.
     {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
+      provide: APP_GUARD, // <- Nest 기본 기능 APP_GUARD를 쓰겠다.
+      useClass: AuthGuard, // <- 여기서 만든 GUARD를 쓰겠다.
     },
   ],
 })

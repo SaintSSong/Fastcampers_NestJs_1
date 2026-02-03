@@ -48,7 +48,7 @@ export class MovieController {
   }
 
   @Post()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard) // <- 이게 있기에 자격이 증명된 사용자만 사용 가능하다.
   postMovie(@Body() body: CreateMovieDto) {
     return this.movieService.create(body);
   }
