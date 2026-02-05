@@ -6,11 +6,8 @@ import { Public } from '../decorator/public.decorator';
 export class AuthGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
   canActivate(context: ExecutionContext): boolean {
-    // 만약에 public decoration이 돼 있으면
-    // 모든 로직을 pass한다.
+    // 만약에 @public이 돼 있으면 모든 로직을 pass한다.
     const isPublic = this.reflector.get(Public, context.getHandler()); //
-
-    console.log('isPublic', isPublic);
 
     if (isPublic) {
       return true;

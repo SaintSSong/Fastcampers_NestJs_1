@@ -3,9 +3,9 @@ import { BaseTable } from 'src/common/entity/base-table.entity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum Role {
-  admin = 'admin',
-  paidUser = 'paidUser',
-  user = 'user',
+  admin,
+  paidUser,
+  user,
 }
 
 @Entity()
@@ -25,6 +25,7 @@ export class User extends BaseTable {
   password: string;
 
   @Column({
+    type: 'int', // ✅ DB에는 숫자로 저장
     enum: Role,
     default: Role.user,
   })
