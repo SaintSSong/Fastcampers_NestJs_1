@@ -3,10 +3,12 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { Movie } from './entity/movie.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Like, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { MovieDetail } from './entity/movie-detail.entity';
 import { Director } from 'src/director/entity/director.entity';
 import { Genre } from 'src/genre/entities/genre.entity';
+import { GetMoviesDto } from './dto/get-movies.dto';
+import { CommonService } from 'src/common/common.service';
 
 @Injectable()
 export class MovieService {
@@ -20,11 +22,18 @@ export class MovieService {
     @InjectRepository(Genre)
     private readonly genreRepository: Repository<Genre>,
     private readonly dataSource: DataSource,
+    private readonly commonService: CommonService,
   ) {}
 
   // 영화 전체 조회
-  async findAll(title?: string) {
-    const qb = await this.movieRepository
+  async findAll(dto: GetMoviesDto) {
+    // 페이지 버전
+    // const { title, take, page } = dto;
+
+    // 커서 버전
+    const { title } = dto;
+
+    const qb = this.movieRepository
       .createQueryBuilder('movie')
       .leftJoinAndSelect('movie.director', 'director')
       .leftJoinAndSelect('movie.genres', 'genres');
@@ -32,6 +41,15 @@ export class MovieService {
     if (title) {
       qb.where('movie.title Like :title', { title: `%${title}%` });
     }
+
+    // // 페이지 기반 페이지 네이션 시 take와 page 가져오는 방법
+    // if (take && page) {
+    //   this.commonService.applyPagePaginationParamsToQb(qb, dto);
+    // }
+
+    // 커서 기반 페이지 네이션 시 take와 page 가져오는 방법
+
+    this.commonService.applyCursorPaginationParamsToQb(qb, dto);
 
     return await qb.getManyAndCount();
 
@@ -77,7 +95,7 @@ export class MovieService {
 
   // 영화 생성
   async create(createMovieDto: CreateMovieDto) {
-    console.log('✅ create() 실행됨'); // <- 이게 서버 켜자마자 찍히면 "부팅 중 호출" 확정
+    // console.log('✅ create() 실행됨'); // <- 이게 서버 켜자마자 찍히면 "부팅 중 호출" 확정
     // 트랜잭션을 사용할때 꼭 이렇게 해야 한다. 쿼리 러너로 해야한다.
     const qr = this.dataSource.createQueryRunner();
     await qr.connect();

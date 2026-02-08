@@ -18,6 +18,10 @@ export class RBACGuard implements CanActivate {
     // 그러면 false가 되고 조건문에서 true만 return 값으로 빠지니까 false를 true로 만들기 위해서 "!"를 붙이는 것이다.
 
     // “role 값이 Role enum 안에 있는 값이야?” 를 확인하는 코드야.
+    // Role Enum에 해당되는 값이 @에 들어갔는지 확인하기!
+
+    // Object.values(Role) =  Role에 있는 모든 값을 다 가져온다.
+    // .includes(role) = 그 중에 role이 있는지 확인한다.
     if (!Object.values(Role).includes(role)) {
       return true;
     }

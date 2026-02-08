@@ -1,6 +1,5 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
   JoinTable,
@@ -8,8 +7,6 @@ import {
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  VersionColumn,
 } from 'typeorm';
 import { BaseTable } from '../../common/entity/base-table.entity';
 import { MovieDetail } from './movie-detail.entity';
@@ -35,6 +32,9 @@ export class Movie extends BaseTable {
   })
   @JoinTable()
   genres: Genre[];
+
+  @Column({ default: 0 })
+  likeCount: number;
 
   @OneToOne(() => MovieDetail, (movieDetail) => movieDetail.id, {
     cascade: true, // <- cascade: true로 해야지 한번에 생성이 가능하다. 아니면 따로 따로 생성해서 그걸 붙여서 반환해야하는데 그러면 길어진다.
