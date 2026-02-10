@@ -1,13 +1,20 @@
-import { IsIn, IsInt, IsOptional } from 'class-validator';
+import { IsArray, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CursorPaginationDto {
-  @IsInt()
+  @IsString()
   @IsOptional()
-  id?: number;
+  // id_52, likeCount_20,
+  cursor?: string;
 
-  @IsIn(['ASC', 'DESC'])
+  @IsArray()
+  @IsString({
+    each: true,
+  })
   @IsOptional()
-  order: 'ASC' | 'DESC' = 'DESC';
+  // id_ASC, id_DESC
+  // order = [id_DESC, likeCount_DESC] 이런 식으로 표현 할 것이다.
+  // 하지만 꼭 이렇게 할 필요는 없다. 모로가도 서울이기만 하면 된다!
+  order: string[] = ['id_DESC']; // id_DESC을 기본 값으로 넣는거다.
 
   @IsInt()
   @IsOptional()

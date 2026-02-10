@@ -48,10 +48,17 @@ export class MovieService {
     // }
 
     // 커서 기반 페이지 네이션 시 take와 page 가져오는 방법
+    const { nextCursor } =
+      await this.commonService.applyCursorPaginationParamsToQb(qb, dto);
 
-    this.commonService.applyCursorPaginationParamsToQb(qb, dto);
+    // count는 조건에 맞는 전체 갯수를 보내준다. 그래야지 현재목록 + 전체 갯수를 알 수 있으니까!
+    const [data, count] = await qb.getManyAndCount();
 
-    return await qb.getManyAndCount();
+    return {
+      data,
+      nextCursor,
+      count,
+    };
 
     // if (!title) {
     //   return [

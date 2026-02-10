@@ -20,9 +20,10 @@ import { UserModule } from './user/user.module';
 import { User } from './user/entities/user.entity';
 import { envVariableKeys } from './common/entity/const/env.const';
 import { BearerTokenMiddleware } from './auth/middleware/bearer-token.middleware';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guard/auth.guard';
 import { RBACGuard } from './auth/guard/rbac.guard';
+import { ResponseTimeInterceptor } from './common/interceptor/response-time.interceptor';
 
 @Module({
   imports: [
@@ -72,6 +73,10 @@ import { RBACGuard } from './auth/guard/rbac.guard';
       provide: APP_GUARD, // <- Nest 기본 기능 APP_GUARD를 쓰겠다.
       useClass: RBACGuard, // <- 여기서 만든 RBACGuard를 쓰겠다.
     },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseTimeInterceptor,
+    },
   ],
 })
 export class AppModule implements NestModule {
@@ -85,18 +90,3 @@ export class AppModule implements NestModule {
       .forRoutes('*');
   }
 }
-
-// 사실 nest에서는 process.env 이걸 잘 안쓴다.
-// nest에서는 IOC 컨테이너에 넣어서 사용하는 방법을 사용한다.
-
-// TypeOrmModule.forRoot({
-//   type: process.env.DB_TYPE as 'postgres',
-//   host: process.env.DB_HOST,
-//   port: parseInt(process.env.DB_PORT ?? '5432', 10),
-//   username: process.env.DB_USERNAME,
-//   password: process.env.DB_PASSWORD,
-//   database: process.env.DB_DATABASE,
-//   entities: [], // <=여기다가는 등록할 엔티티를 넣으면 된다. DB 테이블로 형성한 엔티티를 넣으면 된다.
-//   synchronize: true, // <- 개발할 때만 true 배포하고 나서는 false로 놔야 한다.
-// }), // 우리가 연결하고싶은 DB의 정보를 넣으면 된다.
-// MovieModule,
