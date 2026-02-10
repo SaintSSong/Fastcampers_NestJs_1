@@ -2,9 +2,10 @@ import {
   CallHandler,
   ExecutionContext,
   Injectable,
+  InternalServerErrorException,
   NestInterceptor,
 } from '@nestjs/common';
-import { Observable, tap } from 'rxjs';
+import { delay, Observable, tap } from 'rxjs';
 
 @Injectable()
 export class ResponseTimeInterceptor implements NestInterceptor {
@@ -21,11 +22,20 @@ export class ResponseTimeInterceptor implements NestInterceptor {
     // 엔드포인트 후
 
     return next.handle().pipe(
+      delay(1000),
       tap(() => {
         const respTime = Date.now();
         const diff = respTime - reqTime;
 
-        console.log(`[${req.method} ${req.path}] ${diff}ms`);
+        if (diff > 1000) {
+          console.log(`!!!TimeOut!!! [${req.method} ${req.path}] ${diff}ms`);
+
+          throw new InternalServerErrorException(
+            '시간이 너무 오래 걸렸습니다.',
+          );
+        } else {
+          console.log(`[${req.method} ${req.path}] ${diff}ms`);
+        }
       }),
     );
   }
