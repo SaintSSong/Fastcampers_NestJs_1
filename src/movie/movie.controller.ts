@@ -12,6 +12,7 @@ import {
   ParseIntPipe,
   BadRequestException,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -22,6 +23,8 @@ import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { Role } from 'src/user/entities/user.entity';
 import { GetMoviesDto } from './dto/get-movies.dto';
+import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
+import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptior';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor) // 클래스 트렌스포머 쓴거를 적용 시키려면 꼭 필요하다.
@@ -32,6 +35,7 @@ export class MovieController {
 
   @Get() // <- 이게 왜 되냐? @Controller('movie') 속에 "movie"를 넣었기 때문에 기본적으로 엔드포인트가 "movie"가 된다.
   @Public()
+  // @UseInterceptors(CacheInterceptor)
   getMovies(@Query() dto: GetMoviesDto) {
     return this.movieService.findAll(dto);
   }
@@ -57,8 +61,9 @@ export class MovieController {
   @Post()
   @RBAC(Role.paidUser)
   @UseGuards(AuthGuard) // <- 이게 있기에 자격이 증명된 사용자만 사용 가능하다.
-  postMovie(@Body() body: CreateMovieDto) {
-    return this.movieService.create(body);
+  @UseInterceptors(TransactionInterceptor)
+  postMovie(@Body() body: CreateMovieDto, @Request() req) {
+    return this.movieService.create(body, req.queryRunner);
   }
 
   // 영화 수정

@@ -22,7 +22,7 @@ export class ResponseTimeInterceptor implements NestInterceptor {
     // 엔드포인트 후
 
     return next.handle().pipe(
-      delay(1000),
+      // delay(1000),
       tap(() => {
         const respTime = Date.now();
         const diff = respTime - reqTime;
