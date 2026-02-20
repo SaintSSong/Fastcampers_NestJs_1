@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"/c/Users/Digiforet/Desktop/Project/Nest/Fastcampers_NestJs_1\" status)"
+    ]
+  }
+}

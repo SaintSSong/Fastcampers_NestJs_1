@@ -13,6 +13,8 @@ import {
   BadRequestException,
   UseGuards,
   Request,
+  UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -25,6 +27,12 @@ import { Role } from 'src/user/entities/user.entity';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptior';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
+import { MovieFilePipe } from './pipe/movie-file.pipe';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor) // 클래스 트렌스포머 쓴거를 적용 시키려면 꼭 필요하다.
@@ -62,7 +70,41 @@ export class MovieController {
   @RBAC(Role.paidUser)
   @UseGuards(AuthGuard) // <- 이게 있기에 자격이 증명된 사용자만 사용 가능하다.
   @UseInterceptors(TransactionInterceptor)
-  postMovie(@Body() body: CreateMovieDto, @Request() req) {
+  // @UseInterceptors(FilesInterceptor('movies')) // FileInterceptor는 한 개 FilesInterceptor는 여러 개
+  @UseInterceptors(
+    FileInterceptor('movie', {
+      limits: {
+        fileSize: 20000000, // 20mb
+      },
+      fileFilter(req, file, callback) {
+        console.log('fileFilter', file);
+
+        if (file.mimetype !== 'video/mp4') {
+          return callback(
+            new BadRequestException('MP4 타입만 업로드 가능합니다.'),
+            false,
+          );
+        }
+
+        return callback(null, true); // true 대신 false 하면 파일 저장이 안된다.  // null은 에러 넣는 위치로 해당 위치에 에러를 넣으면 에러 발생!
+      },
+    }),
+  ) // FileInterceptor는 한 개 FilesInterceptor는 여러 개
+  postMovie(
+    @Body() body: CreateMovieDto,
+    @Request() req,
+    // @UploadedFiles() files: Express.Multer.File[], // 복수에서 s를 붙이냐 안붙이냐로 실수가 엄청 많이 난다. 조심!
+    @UploadedFile(
+      new MovieFilePipe({
+        maxSize: 20,
+        mimetype: 'video/mp4',
+      }),
+    )
+    movie: Express.Multer.File,
+  ) {
+    console.log('--------------------------------');
+    console.log('movie', movie);
+
     return this.movieService.create(body, req.queryRunner);
   }
 
