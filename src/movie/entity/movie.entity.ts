@@ -27,7 +27,7 @@ export class Movie extends BaseTable {
   })
   title: string;
 
-  @ManyToMany(() => Genre, (gnere) => gnere.movies, {
+  @ManyToMany(() => Genre, (genre) => genre.movies, {
     // cascade: true,
   })
   @JoinTable()
@@ -42,6 +42,9 @@ export class Movie extends BaseTable {
   }) // 나랑 관계를 맻는 녀석을 작성해줘야한다.
   @JoinColumn() // <- 영화와 영화 상세 둘 중 영화가 가지고 있는게 더 좋다. 사실 상관은 없다. 상대편에 넣어도 된다.
   detail: MovieDetail;
+
+  @Column() // <- 이게 나중에 추가한 칼럼인데 추가하면 당연히 마이그레이션 하지 않은 이상 DB에 데이터가 있다면 에러가 날 것이다. 그때는 개발 중이라면 그냥 DROP한 다음 다시 만들어라
+  movieFilePath: string;
 
   @ManyToOne(() => Director, (director) => director.id, {
     cascade: true,

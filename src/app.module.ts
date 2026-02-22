@@ -26,6 +26,9 @@ import { RBACGuard } from './auth/guard/rbac.guard';
 import { ResponseTimeInterceptor } from './common/interceptor/response-time.interceptor';
 import { ForbiddenExceptionFilter } from './common/filter/forbidden.filter';
 import { QueryFailedExceptionFilter } from './common/filter/query-failed.filter';
+import { ServeStaticModule } from '@nestjs/serve-static';
+
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -58,6 +61,11 @@ import { QueryFailedExceptionFilter } from './common/filter/query-failed.filter'
         synchronize: true, // <- 개발할 때만 true 배포하고 나서는 false로 놔야 한다.
       }),
       inject: [ConfigService],
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'public'), // <- 기본적으로 어떤 폴더에서 파일을 전송 할 것인지?
+      // 이렇게하면 기본적으로 root 폴더 속 많은 폴더 중에서 "public"폴더만 접근 가능하다.
+      serveRoot: '/public',
     }),
     MovieModule,
     DirectorModule,

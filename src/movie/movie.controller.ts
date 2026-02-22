@@ -26,7 +26,7 @@ import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { Role } from 'src/user/entities/user.entity';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
-import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptior';
+import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
 import {
   FileFieldsInterceptor,
   FileInterceptor,
@@ -102,10 +102,7 @@ export class MovieController {
     )
     movie: Express.Multer.File,
   ) {
-    console.log('--------------------------------');
-    console.log('movie', movie);
-
-    return this.movieService.create(body, req.queryRunner);
+    return this.movieService.create(body, movie.filename, req.queryRunner);
   }
 
   // 영화 수정

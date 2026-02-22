@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git -C \"/c/Users/Digiforet/Desktop/Project/Nest/Fastcampers_NestJs_1\" status)"
+      "Bash(git -C \"/c/Users/Digiforet/Desktop/Project/Nest/Fastcampers_NestJs_1\" status)",
+      "Bash(npm install:*)",
+      "Bash(npm --version:*)",
+      "Bash(node --version:*)",
+      "Bash(pnpm --version:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm start:dev:*)"
     ]
   }
 }

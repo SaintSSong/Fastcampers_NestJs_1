@@ -14,6 +14,8 @@ import { Genre } from 'src/genre/entities/genre.entity';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { CommonService } from 'src/common/common.service';
 
+import { join } from 'path';
+
 @Injectable()
 export class MovieService {
   constructor(
@@ -105,7 +107,11 @@ export class MovieService {
   }
 
   // 영화 생성
-  async create(createMovieDto: CreateMovieDto, qr: QueryRunner) {
+  async create(
+    createMovieDto: CreateMovieDto,
+    movieFileName: string,
+    qr: QueryRunner,
+  ) {
     // console.log('✅ create() 실행됨'); // <- 이게 서버 켜자마자 찍히면 "부팅 중 호출" 확정
     // 트랜잭션을 사용할때 꼭 이렇게 해야 한다. 쿼리 러너로 해야한다.
     // const qr = this.dataSource.createQueryRunner();
@@ -156,6 +162,9 @@ export class MovieService {
 
     const movieDetailId = movieDetail.identifiers[0].id;
 
+    // 폴더의 위치 주소를 나타낸다.
+    const movieFolder = join('public', 'movie');
+
     const movie = await qr.manager
       .createQueryBuilder()
       .insert()
@@ -166,6 +175,9 @@ export class MovieService {
           id: movieDetailId,
         },
         director,
+        // join의 효과를 정확하게 알아야한다.
+        // 폴더의 위치(movieFolder) 속에서 무슨 파일 이름(movieFileName)(컨트롤러에서 넘겨 받은)인지까지 같이 넣어준다.
+        movieFilePath: join(movieFolder, movieFileName), // movieFolder 위치에 movieFileName 이름까지 넣는다.
       })
       .execute();
 
