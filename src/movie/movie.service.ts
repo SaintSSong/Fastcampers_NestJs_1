@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { Movie } from './entity/movie.entity';
@@ -15,6 +11,8 @@ import { GetMoviesDto } from './dto/get-movies.dto';
 import { CommonService } from 'src/common/common.service';
 
 import { join } from 'path';
+
+import { rename } from 'fs/promises';
 
 @Injectable()
 export class MovieService {
@@ -48,11 +46,6 @@ export class MovieService {
       qb.where('movie.title Like :title', { title: `%${title}%` });
     }
 
-    // // 페이지 기반 페이지 네이션 시 take와 page 가져오는 방법
-    // if (take && page) {
-    //   this.commonService.applyPagePaginationParamsToQb(qb, dto);
-    // }
-
     // 커서 기반 페이지 네이션 시 take와 page 가져오는 방법
     const { nextCursor } =
       await this.commonService.applyCursorPaginationParamsToQb(qb, dto);
@@ -65,21 +58,6 @@ export class MovieService {
       nextCursor,
       count,
     };
-
-    // if (!title) {
-    //   return [
-    //     await this.movieRepository.find({
-    //       relations: ['director', 'genres'],
-    //     }),
-    //     await this.movieRepository.count(), //<- count 왜 하냐? 200만개 이렇게 있으면 총 몇개 있는지 바로 알 수 있고 나중에 페이지네이션 걸면 되니까 그렇다.
-    //   ];
-    // }
-    // return await this.movieRepository.findAndCount({
-    //   where: {
-    //     title: Like(`%${title}%`), // 이렇게 넣어주면 꼭 그것만 아니여도 가져 올 수 있다.
-    //   },
-    //   relations: ['director', 'genres'],
-    // });
   }
 
   // 영화 상세 조회
@@ -107,11 +85,7 @@ export class MovieService {
   }
 
   // 영화 생성
-  async create(
-    createMovieDto: CreateMovieDto,
-    movieFileName: string,
-    qr: QueryRunner,
-  ) {
+  async create(createMovieDto: CreateMovieDto, qr: QueryRunner) {
     // console.log('✅ create() 실행됨'); // <- 이게 서버 켜자마자 찍히면 "부팅 중 호출" 확정
     // 트랜잭션을 사용할때 꼭 이렇게 해야 한다. 쿼리 러너로 해야한다.
     // const qr = this.dataSource.createQueryRunner();
@@ -165,6 +139,15 @@ export class MovieService {
     // 폴더의 위치 주소를 나타낸다.
     const movieFolder = join('public', 'movie');
 
+    // 파일이 들어있는 임시 저장소 위치
+    const tempFolder = join('public', 'temp');
+
+    // 임시 저장소에 들어있는 영화를 영구 저장소로 옮기는 코드
+    await rename(
+      join(process.cwd(), tempFolder, createMovieDto.movieFileName),
+      join(process.cwd(), movieFolder, createMovieDto.movieFileName),
+    );
+
     const movie = await qr.manager
       .createQueryBuilder()
       .insert()
@@ -177,7 +160,7 @@ export class MovieService {
         director,
         // join의 효과를 정확하게 알아야한다.
         // 폴더의 위치(movieFolder) 속에서 무슨 파일 이름(movieFileName)(컨트롤러에서 넘겨 받은)인지까지 같이 넣어준다.
-        movieFilePath: join(movieFolder, movieFileName), // movieFolder 위치에 movieFileName 이름까지 넣는다.
+        movieFilePath: join(movieFolder, createMovieDto.movieFileName), // movieFolder 위치에 movieFileName 이름까지 넣는다.
       })
       .execute();
 

@@ -31,4 +31,7 @@ export class CreateMovieDto {
   )
   @Type(() => Number) // 이걸 하는 이유는 Multer에서 폼 데이터는 string으로 밖에 안넘어와서 여기서 변신시켜주는거다.
   genreIds: number[];
+
+  @IsString()
+  movieFileName: string;
 }

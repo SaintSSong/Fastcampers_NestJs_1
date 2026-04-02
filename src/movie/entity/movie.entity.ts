@@ -12,6 +12,7 @@ import { BaseTable } from '../../common/entity/base-table.entity';
 import { MovieDetail } from './movie-detail.entity';
 import { Director } from 'src/director/entity/director.entity';
 import { Genre } from 'src/genre/entities/genre.entity';
+import { Transform } from 'class-transformer';
 
 // ManyToOne  감독 - >감독은 여러개의 영화를 만들 수 있음.
 // OneToOne   무비 디테일 -> 영화는 하나의 상세 내용을 가질 수 있음
@@ -44,6 +45,8 @@ export class Movie extends BaseTable {
   detail: MovieDetail;
 
   @Column() // <- 이게 나중에 추가한 칼럼인데 추가하면 당연히 마이그레이션 하지 않은 이상 DB에 데이터가 있다면 에러가 날 것이다. 그때는 개발 중이라면 그냥 DROP한 다음 다시 만들어라
+  // Transform 이거 왜 하냐? 이렇게 하면 Get요청이나 프론트에 넘겨줄때 바로 http 넣어서 줄 수 있어서 협응이 좋아진다. 충분히 익숙해진 후에 사용해라.
+  @Transform(({ value }) => `http://localhost:3000/${value}`)
   movieFilePath: string;
 
   @ManyToOne(() => Director, (director) => director.id, {
