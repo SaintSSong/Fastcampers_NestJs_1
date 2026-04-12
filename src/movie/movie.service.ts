@@ -67,6 +67,7 @@ export class MovieService {
       .leftJoinAndSelect('movie.director', 'director')
       .leftJoinAndSelect('movie.genres', 'genres')
       .leftJoinAndSelect('movie.detail', 'detail')
+      .leftJoinAndSelect('movie.creator', 'creator')
       .where('movie.id = :id', { id })
       .getOne();
 
@@ -85,7 +86,11 @@ export class MovieService {
   }
 
   // 영화 생성
-  async create(createMovieDto: CreateMovieDto, qr: QueryRunner) {
+  async create(
+    createMovieDto: CreateMovieDto,
+    userId: number,
+    qr: QueryRunner,
+  ) {
     // console.log('✅ create() 실행됨'); // <- 이게 서버 켜자마자 찍히면 "부팅 중 호출" 확정
     // 트랜잭션을 사용할때 꼭 이렇게 해야 한다. 쿼리 러너로 해야한다.
     // const qr = this.dataSource.createQueryRunner();
@@ -142,12 +147,6 @@ export class MovieService {
     // 파일이 들어있는 임시 저장소 위치
     const tempFolder = join('public', 'temp');
 
-    // 임시 저장소에 들어있는 영화를 영구 저장소로 옮기는 코드
-    await rename(
-      join(process.cwd(), tempFolder, createMovieDto.movieFileName),
-      join(process.cwd(), movieFolder, createMovieDto.movieFileName),
-    );
-
     const movie = await qr.manager
       .createQueryBuilder()
       .insert()
@@ -158,6 +157,9 @@ export class MovieService {
           id: movieDetailId,
         },
         director,
+        creator: {
+          id: userId,
+        },
         // join의 효과를 정확하게 알아야한다.
         // 폴더의 위치(movieFolder) 속에서 무슨 파일 이름(movieFileName)(컨트롤러에서 넘겨 받은)인지까지 같이 넣어준다.
         movieFilePath: join(movieFolder, createMovieDto.movieFileName), // movieFolder 위치에 movieFileName 이름까지 넣는다.
@@ -172,6 +174,12 @@ export class MovieService {
       .relation(Movie, 'genres')
       .of(movieId)
       .add(genres.map((genres) => genres.id));
+
+    // 임시 저장소에 들어있는 영화를 영구 저장소로 옮기는 코드
+    await rename(
+      join(process.cwd(), tempFolder, createMovieDto.movieFileName),
+      join(process.cwd(), movieFolder, createMovieDto.movieFileName),
+    );
 
     // 이렇게 qr.manager로 해놓으면 트랜잭션이 커밋되기 전에 무엇을 생성하는지 찾아서 보여줄 수 있다.
     return await qr.manager.findOne(Movie, {

@@ -33,6 +33,7 @@ import {
   FilesInterceptor,
 } from '@nestjs/platform-express';
 import { MovieFilePipe } from './pipe/movie-file.pipe';
+import { UserId } from 'src/user/decorator/user-id.decorator';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor) // 클래스 트렌스포머 쓴거를 적용 시키려면 꼭 필요하다.
@@ -41,6 +42,7 @@ export class MovieController {
 
   // @Get('movie') // <- 같은 get이여도 데코레이터(@)에 엔드포인트를 집어 넣으면 해당 엔드포인트로 집결된다.
 
+  // 영화 목록 조회
   @Get() // <- 이게 왜 되냐? @Controller('movie') 속에 "movie"를 넣었기 때문에 기본적으로 엔드포인트가 "movie"가 된다.
   @Public()
   // @UseInterceptors(CacheInterceptor)
@@ -48,6 +50,7 @@ export class MovieController {
     return this.movieService.findAll(dto);
   }
 
+  // 영화 상세 조회
   @Get(':id')
   @Public()
   getMovie(
@@ -61,23 +64,22 @@ export class MovieController {
     )
     id: number,
   ) {
-    console.log('id', typeof id);
+    console.log('id', id);
     return this.movieService.findOne(id);
   }
 
   // 영화 생성 //
   @Post()
-  @RBAC(Role.paidUser)
+  @RBAC(Role.paidUser) // paidUser
   @UseGuards(AuthGuard) // <- 이게 있기에 자격이 증명된 사용자만 사용 가능하다.
   @UseInterceptors(TransactionInterceptor)
-  // @UseInterceptors(FilesInterceptor('movies')) // FileInterceptor는 한 개 FilesInterceptor는 여러 개
   postMovie(
     @Body() body: CreateMovieDto,
     @Request() req,
-    // @UploadedFiles() files: Express.Multer.File[], // 복수에서 s를 붙이냐 안붙이냐로 실수가 엄청 많이 난다. 조심!
-    movie: Express.Multer.File,
+    @UserId() userId: number,
   ) {
-    return this.movieService.create(body, req.queryRunner);
+    console.log('여긴 들어오나?');
+    return this.movieService.create(body, userId, req.queryRunner);
   }
 
   // 영화 수정

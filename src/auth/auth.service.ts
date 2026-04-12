@@ -153,7 +153,7 @@ export class AuthService {
 
     return this.jwtService.signAsync(
       {
-        id: user.id,
+        sub: user.id,
         // role: Role[user.role], // 이렇게 하면 문자열이 들어가고
         role: user.role,
         type: isRefreshToken ? 'refresh' : 'access',
